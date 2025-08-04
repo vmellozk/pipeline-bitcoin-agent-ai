@@ -33,7 +33,7 @@ Criar uma solução simples e modular que:
 ## 🏗️ Estrutura do Projeto
 
 ```bash
-PIPELINE-BITCOIN-AGNO
+PIPELINE-BITCOIN-AGENT-AI
 ├── agents/
 │ ├── bitcoin_agent.py                          # Agente IA com Groq e DuckDuckGo
 │ └── bitcoin_agent_postgres.py                 # Agente IA com integração ao PostgreSQL
@@ -67,8 +67,8 @@ PIPELINE-BITCOIN-AGNO
 1. Clone o repositório:
 
 ```bash
-git clone https://github.com/vmellozk/pipeline-bitcoin-agno.git
-cd pipeline-bitcoin-agno
+git clone https://github.com/vmellozk/pipeline-bitcoin-agent-ai.git
+cd pipeline-bitcoin-agent-ai
 ```
 
 2. Instale as dependências:
