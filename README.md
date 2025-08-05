@@ -88,7 +88,7 @@ python pipeline/consulta_preco_bitcoin_v2.py
 
 - Para coletar dados e salvar no PostgreSQL:
 ```bash
-python pipeline/consulta_preco_bitcoin_v3_postgree.py
+python pipeline/consulta_preco_bitcoin_v3_postgres.py
 ```
 
 - Para visualizar o dashboard:
