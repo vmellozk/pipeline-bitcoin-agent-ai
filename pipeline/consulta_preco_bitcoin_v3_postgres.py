@@ -70,5 +70,5 @@ if __name__ == "__main__":
         salvar_dados_sqlalchemy(dados_tratados)
         
         # Pausar por 15 segundos
-        print("Aguardando 2 minutos...")
-        sleep(120)
+        print("Aguardando 1 minuto...")
+        sleep(60)
