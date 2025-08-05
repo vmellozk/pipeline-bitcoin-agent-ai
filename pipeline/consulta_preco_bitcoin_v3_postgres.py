@@ -69,6 +69,6 @@ if __name__ == "__main__":
         # Salvar no PostgreSQL
         salvar_dados_sqlalchemy(dados_tratados)
         
-        # Pausar por 15 segundos
+        # 
         print("Aguardando 1 minuto...")
         sleep(60)
