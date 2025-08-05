@@ -44,7 +44,7 @@ PIPELINE-BITCOIN-AGENT-AI
 │ ├── nasa_mars_photos.py                       # Consumo de API da NASA
 │ ├── consulta_preco_bitcoin_v1.py              # ETL básico do preço do Bitcoin
 │ ├── consulta_preco_bitcoin_v2_tinydb.py       # ETL com armazenamento em TinyDB
-│ └── consulta_preco_bitcoin_v3_postgree.py     # ETL completo com PostgreSQL e SQLAlchemy
+│ └── consulta_preco_bitcoin_v3_postgres.py     # ETL completo com PostgreSQL e SQLAlchemy
 ├── db.json                                     # Banco local TinyDB (você precisa criar um arquivo com esse nome para o tinydb funcionar)
 ├── .env                                        # Variáveis de ambiente (aqui você coloca as keys, credenciais...)
 ├── .gitignore                                  # Arquivos ignorados no Git
