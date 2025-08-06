@@ -3,6 +3,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import os
 from dotenv import load_dotenv
+import altair as alt
 
 # Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -38,9 +39,21 @@ def main():
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         df = df.sort_values(by='timestamp')
         
+        # Gráfico
         st.subheader("Evolução do Preço do Bitcoin")
-        st.line_chart(data=df, x='timestamp', y='valor', use_container_width=True)
         
+        chart = alt.Chart(df).mark_line().encode(
+            x='timestamp:T',
+            y=alt.Y('valor:Q', scale=alt.Scale(zero=False)),
+            tooltip=['timestamp:T', 'valor:Q']
+        ).properties(
+            width='container',
+            height=400
+        ).interactive()
+        
+        st.altair_chart(chart, use_container_width=True)
+        
+        # Estatísticas Gerais
         st.subheader("Estatísticas Gerais")
         col1, col2, col3 = st.columns(3)
         col1.metric("Preço Atual", f"${df['valor'].iloc[-1]:,.2f}")
