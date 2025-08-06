@@ -55,17 +55,23 @@ def main():
         
         # Gráfico do Histórico do Preço do Bitcoin (alterar, colocar o intervalo do valor de 50 em 50 dólares, e não uma margem mt pequena)
         st.subheader("Evolução do Preço do Bitcoin")
+        mostrar_media = st.checkbox("Exibir Média Móvel", value=False)
         
-        chart = alt.Chart(df_filtrado).mark_line().encode(
+        grafico_preco = alt.Chart(df_filtrado).mark_line(color='steelblue').encode(
             x='timestamp:T',
-            y=alt.Y('valor:Q', scale=alt.Scale(zero=False)),
+            y=alt.Y('valor:Q', scale=alt.Scale(zero=False), title='Preço ($)'),
             tooltip=['timestamp:T', 'valor:Q']
-        ).properties(
-            width='container',
-            height=400
-        ).interactive()
-        
-        st.altair_chart(chart, use_container_width=True)
+        )
+        if mostrar_media:
+            df_filtrado['media_movel'] = df_filtrado['valor'].rolling(window=5).mean()
+            grafico_media = alt.Chart(df_filtrado).mark_line(color='green').encode(
+                x='timestamp:T',
+                y=alt.Y('media_movel:Q', title='Média Móvel'),
+                tooltip=['timestamp:T', 'media_movel:Q']
+            )
+            st.altair_chart((grafico_preco + grafico_media).interactive(), use_container_width=True)
+        else:
+            st.altair_chart(grafico_preco.interactive(), use_container_width=True)
         
         # Calculando a porcentagem de variação entre o preço anterior.
         preco_atual = df['valor'].iloc[-1]
@@ -97,18 +103,6 @@ def main():
         
         st.subheader("Variação Percentual do Preço")
         st.altair_chart(chart_var, use_container_width=True)
-        
-        # Análise de média móvel
-        df['media_movel'] = df['valor'].rolling(window=5).mean()
-        
-        chart_ma = alt.Chart(df).mark_line(color='green').encode(
-            x='timestamp:T',
-            y=alt.Y('media_movel:Q', title="Média Móvel"),
-            tooltip=['timestamp:T', 'media_movel:Q']
-        )
-        
-        st.subheader("Média Móvel (5 últimos pontos)")
-        st.altair_chart(chart + chart_ma, use_container_width=True)
     else:
         st.warning("Nenhum dado encontrado no banco de dados PostgreSQL.")
 
