@@ -4,6 +4,7 @@ import pandas as pd
 import os
 from dotenv import load_dotenv
 import altair as alt
+from datetime import timedelta
 
 # Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -38,13 +39,16 @@ def main():
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         df = df.sort_values(by='timestamp')
         
-        # Filtro --> mexer (colocar os últimos 30 dias automático)
+        # Filtro
         st.sidebar.subheader("Filtros")
-        data_inicial = st.sidebar.date_input("Data Inicial", df['timestamp'].min().date())
-        data_final = st.sidebar.date_input("Data Final", df['timestamp'].min().date())
-        df_filtrado = df[(df['timestamp'] >= pd.to_datetime(data_inicial)) & (df['timestamp'] <= pd.to_datetime(data_final))]
+        data_mais_recente = df['timestamp'].max().date()
+        data_inicial_padrao = data_mais_recente - timedelta(days=30)
         
-        # Botão de atualizar (adicionar auto atualização a cada 2 minutos)
+        data_inicial = st.sidebar.date_input("Data Inicial", value=data_inicial_padrao)
+        data_final = st.sidebar.date_input("Data Final", value=data_mais_recente)
+        df_filtrado = df[(df['timestamp'].dt.date >= data_inicial) & (df['timestamp'].dt.date <= data_final)]
+        
+        # Botão de atualizar
         st.sidebar.subheader("Atualização")
         refresh = st.sidebar.button("Atualizar dados")
         if refresh:
@@ -53,7 +57,7 @@ def main():
         # Botão de exportar em CSV
         st.download_button("Baixar CSV", data=df.to_csv(index=False), file_name="dados_bitcoin.csv", mime="text/csv")
         
-        # Gráfico do Histórico do Preço do Bitcoin (alterar, colocar o intervalo do valor de 50 em 50 dólares, e não uma margem mt pequena)
+        # Gráfico do Histórico do Preço do Bitcoin
         st.subheader("Evolução do Preço do Bitcoin")
         mostrar_media = st.checkbox("Exibir Média Móvel", value=False)
         
@@ -61,6 +65,9 @@ def main():
             x='timestamp:T',
             y=alt.Y('valor:Q', scale=alt.Scale(zero=False), title='Preço ($)'),
             tooltip=['timestamp:T', 'valor:Q']
+        ).properties(
+            width='container',
+            height=550
         )
         if mostrar_media:
             df_filtrado['media_movel'] = df_filtrado['valor'].rolling(window=5).mean()
@@ -68,6 +75,9 @@ def main():
                 x='timestamp:T',
                 y=alt.Y('media_movel:Q', title='Média Móvel'),
                 tooltip=['timestamp:T', 'media_movel:Q']
+            ).properties(
+                width='container',
+                height=550
             )
             st.altair_chart((grafico_preco + grafico_media).interactive(), use_container_width=True)
         else:
@@ -75,34 +85,28 @@ def main():
         
         # Calculando a porcentagem de variação entre o preço anterior.
         preco_atual = df['valor'].iloc[-1]
-        preco_anterior = df['valor'].iloc[-2]
-        delta = ((preco_atual - preco_anterior) / preco_anterior) * 100
+        data_atual = df['timestamp'].iloc[-1]
+        data_24h = data_atual - timedelta(days=1)
         
-        # Estatísticas Gerais --> mexer (colocar para comparar o preço atual com base nos últimos 7 dias, para avaliar a porcentagem entre eles e não com o último)
+        df['diferenca'] = (df['timestamp'] - data_24h).abs()
+        indice_mais_proximo = df['diferenca'].idxmin()
+        preco_ontem = df.loc[indice_mais_proximo, 'valor']
+        
+        delta = ((preco_atual - preco_ontem) / preco_ontem) * 100
+        legenda_delta = f"{delta:.2f}% (vs 24h atrás)"
+        df.drop(columns='diferenca', inplace=True)
+        
+        # Estatísticas Gerais
         st.subheader("Estatísticas Gerais")
         col1, col2, col3 = st.columns(3)
-        col1.metric("Preço Atual", f"${preco_atual:,.2f}", f"{delta:.2f}%")
+        col1.metric("Preço Atual", f"${preco_atual:,.2f}", legenda_delta)
         col2.metric("Preço Máximo", f"${df['valor'].max():,.2f}")
         col3.metric("Preço Mínimo", f"${df['valor'].min():,.2f}")
         
-        # Análise de tendência (colocar para analisar os últimos 7 dias e não referente ao último preço)
+        # Análise de tendência
         tendencia = "em alta" if delta > 0 else "em queda"
-        st.info(f"O preço do Bitcoin está {tendencia} nos últimos registros.")
-        
-        # Gráfico da Variação Percentual
-        df['variacao_%'] = df['valor'].pct_change() * 100
-        
-        chart_var = alt.Chart(df).mark_line(color='orange').encode(
-            x='timestamp:T',
-            y=alt.Y('variacao_%:Q', title='Variação (%)'),
-            tooltip=['timestamp:T', 'variacao_%:Q']
-        ).properties(
-            width='container',
-            height=300
-        ).interactive()
-        
-        st.subheader("Variação Percentual do Preço")
-        st.altair_chart(chart_var, use_container_width=True)
+        st.info(f"O preço do Bitcoin está {tendencia} nas últimas 24h.")
+    
     else:
         st.warning("Nenhum dado encontrado no banco de dados PostgreSQL.")
 
