@@ -1,0 +1,116 @@
+import streamlit as st
+from sqlalchemy import create_engine
+import pandas as pd
+import os
+from dotenv import load_dotenv
+import altair as alt
+
+# Carrega variáveis de ambiente do arquivo .env
+load_dotenv()
+
+# Lê a variável DATABASE_URL
+DATABASE_URL = os.getenv("DATABASE_KEY")
+
+# Crie o engine SQLAlchemy
+engine = create_engine(DATABASE_URL)
+
+# Lê os dados do banco PostgreSQL e retorna como DataFrame
+def ler_dados_postgres():
+    try:
+        query = "SELECT * FROM bitcoin_dados ORDER BY timestamp DESC"
+        df = pd.read_sql(query, engine)
+        return df
+    except Exception as e:
+        st.error(f"Erro ao conectar no PostgreSQL: {e}")
+        return pd.DataFrame()
+    
+# Função principal do dashboard
+def main():
+    st.set_page_config(page_title="Dashboard de Preços do Bitcoin", layout="wide")
+    st.title("Dashboard de Preços do Bitcoin")
+    st.write("Este dashboard exibe os dados do preço do Bitcoin coletados periodicamente em um banco PostgreSQL.")
+    
+    df = ler_dados_postgres()
+    
+    if not df.empty:
+        st.subheader("Dados Recentes")
+        st.dataframe(df)
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df = df.sort_values(by='timestamp')
+        
+        # Filtro --> mexer (colocar os últimos 30 dias automático)
+        st.sidebar.subheader("Filtros")
+        data_inicial = st.sidebar.date_input("Data Inicial", df['timestamp'].min().date())
+        data_final = st.sidebar.date_input("Data Final", df['timestamp'].min().date())
+        df_filtrado = df[(df['timestamp'] >= pd.to_datetime(data_inicial)) & (df['timestamp'] <= pd.to_datetime(data_final))]
+        
+        # Botão de atualizar (adicionar auto atualização a cada 2 minutos)
+        st.sidebar.subheader("Atualização")
+        refresh = st.sidebar.button("Atualizar dados")
+        if refresh:
+            st.rerun()
+        
+        # Botão de exportar em CSV
+        st.download_button("Baixar CSV", data=df.to_csv(index=False), file_name="dados_bitcoin.csv", mime="text/csv")
+        
+        # Gráfico do Histórico do Preço do Bitcoin (alterar, colocar o intervalo do valor de 50 em 50 dólares, e não uma margem mt pequena)
+        st.subheader("Evolução do Preço do Bitcoin")
+        
+        chart = alt.Chart(df_filtrado).mark_line().encode(
+            x='timestamp:T',
+            y=alt.Y('valor:Q', scale=alt.Scale(zero=False)),
+            tooltip=['timestamp:T', 'valor:Q']
+        ).properties(
+            width='container',
+            height=400
+        ).interactive()
+        
+        st.altair_chart(chart, use_container_width=True)
+        
+        # Calculando a porcentagem de variação entre o preço anterior.
+        preco_atual = df['valor'].iloc[-1]
+        preco_anterior = df['valor'].iloc[-2]
+        delta = ((preco_atual - preco_anterior) / preco_anterior) * 100
+        
+        # Estatísticas Gerais --> mexer (colocar para comparar o preço atual com base nos últimos 7 dias, para avaliar a porcentagem entre eles e não com o último)
+        st.subheader("Estatísticas Gerais")
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Preço Atual", f"${preco_atual:,.2f}", f"{delta:.2f}%")
+        col2.metric("Preço Máximo", f"${df['valor'].max():,.2f}")
+        col3.metric("Preço Mínimo", f"${df['valor'].min():,.2f}")
+        
+        # Análise de tendência (colocar para analisar os últimos 7 dias e não referente ao último preço)
+        tendencia = "em alta" if delta > 0 else "em queda"
+        st.info(f"O preço do Bitcoin está {tendencia} nos últimos registros.")
+        
+        # Gráfico da Variação Percentual
+        df['variacao_%'] = df['valor'].pct_change() * 100
+        
+        chart_var = alt.Chart(df).mark_line(color='orange').encode(
+            x='timestamp:T',
+            y=alt.Y('variacao_%:Q', title='Variação (%)'),
+            tooltip=['timestamp:T', 'variacao_%:Q']
+        ).properties(
+            width='container',
+            height=300
+        ).interactive()
+        
+        st.subheader("Variação Percentual do Preço")
+        st.altair_chart(chart_var, use_container_width=True)
+        
+        # Análise de média móvel
+        df['media_movel'] = df['valor'].rolling(window=5).mean()
+        
+        chart_ma = alt.Chart(df).mark_line(color='green').encode(
+            x='timestamp:T',
+            y=alt.Y('media_movel:Q', title="Média Móvel"),
+            tooltip=['timestamp:T', 'media_movel:Q']
+        )
+        
+        st.subheader("Média Móvel (5 últimos pontos)")
+        st.altair_chart(chart + chart_ma, use_container_width=True)
+    else:
+        st.warning("Nenhum dado encontrado no banco de dados PostgreSQL.")
+
+if __name__ == "__main__":
+    main()
