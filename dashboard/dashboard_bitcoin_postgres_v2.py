@@ -106,24 +106,7 @@ def main():
         # Análise de tendência
         tendencia = "em alta" if delta > 0 else "em queda"
         st.info(f"O preço do Bitcoin está {tendencia} nas últimas 24h.")
-        
-        # Variação percentual diária
-        df_daily = df.set_index('timestamp').resample('D').last().reset_index()
-        df_daily['pct_change'] = df_daily['valor'].pct_change() * 100
-        df_daily['dia'] = df_daily['timestamp'].dt.strftime('%d/%m')
-        
-        grafico_var_pct = alt.Chart(df_daily).mark_bar(color='purple').encode(
-            x=alt.X('dia:N', title='Data', axis=alt.Axis(labelAngle=-45)),
-            y=alt.Y('pct_change:Q', title='Variação %', axis=alt.Axis(format='.2f')),
-            tooltip=[alt.Tooltip('timestamp:T', title='Data'),
-                     alt.Tooltip('pct_change:Q', title='Variação (%)', format='.2f')]
-        ).properties(
-            title='Variação Percentual Diária',
-            width='container',
-            height=300
-        ).interactive()
-        st.altair_chart(grafico_var_pct, use_container_width=True)
-        
+    
     else:
         st.warning("Nenhum dado encontrado no banco de dados PostgreSQL.")
 
