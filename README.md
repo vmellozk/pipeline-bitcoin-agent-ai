@@ -59,13 +59,14 @@ PIPELINE-BITCOIN-AGENT-AI
 
 ## 🛠️ Tecnologias Utilizadas
 
-- ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python) – Linguagem principal do projeto.  
-- ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white) – Dashboard interativo para visualização dos dados.  
-- ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-FFCA28?logo=python&logoColor=black) – ORM para integração com bancos de dados relacionais.  
-- ![TinyDB](https://img.shields.io/badge/TinyDB-00BFFF?logo=python&logoColor=white) – Banco de dados NoSQL local e leve.  
-- ![dotenv](https://img.shields.io/badge/dotenv-4E9A06?logo=python&logoColor=white) – Gerenciamento de variáveis de ambiente.  
-- ![Requests](https://img.shields.io/badge/Requests-0052CC?logo=python&logoColor=white) – Consumo de APIs HTTP.  
-- ![Pandas](https://img.shields.io/badge/Pandas-150458?logo=pandas&logoColor=white) – Manipulação e análise de dados.  
+- ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python) – Linguagem principal do projeto.
+- ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white) – Dashboard interativo para visualização dos dados.
+- ![Altair](https://img.shields.io/badge/Altair-FF6600?logo=altair&logoColor=white) – Biblioteca para criação de gráficos interativos.
+- ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-FFCA28?logo=python&logoColor=black) – ORM para integração com bancos de dados relacionais.
+- ![TinyDB](https://img.shields.io/badge/TinyDB-00BFFF?logo=python&logoColor=white) – Banco de dados NoSQL local e leve.
+- ![dotenv](https://img.shields.io/badge/dotenv-4E9A06?logo=python&logoColor=white) – Gerenciamento de variáveis de ambiente.
+- ![Requests](https://img.shields.io/badge/Requests-0052CC?logo=python&logoColor=white) – Consumo de APIs HTTP.
+- ![Pandas](https://img.shields.io/badge/Pandas-150458?logo=pandas&logoColor=white) – Manipulação e análise de dados.
 - ![Agno](https://img.shields.io/badge/Agno-000?logo=python&logoColor=white) – Framework para agentes de IA.
 
 ## 🧪 Como Rodar Localmente
