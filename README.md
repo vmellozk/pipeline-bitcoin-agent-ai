@@ -35,13 +35,13 @@ Criar uma solução simples e modular que:
 ```bash
 PIPELINE-BITCOIN-AGENT-AI
 ├── .devcontainer/
-│ ├── devcontainer.json                         # Configuração para ambientes de desenvolvimento no VS Code com Dev Containers.
+│ └── devcontainer.json                         # Configuração para ambientes de desenvolvimento no VS Code com Dev Containers.
 ├── agents/
 │ ├── bitcoin_agent.py                          # Agente IA com Groq e DuckDuckGo.
 │ └── bitcoin_agent_postgres.py                 # Agente IA com integração ao PostgreSQL.
 ├── dashboard/
-│ └── dashboard_bitcoin_postgres_v1.py          # Dashboard Streamlit para visualização dos dados, versão 1.
-│ └── dashboard_bitcoin_postgres_v2.py          # Dashboard Streamlit para visualização dos dados, versão 2. Utilizada para deploy.
+│ ├── dashboard_bitcoin_postgres_v1.py          # Dashboard Streamlit para visualização dos dados, versão 1.
+│ ├── dashboard_bitcoin_postgres_v2.py          # Dashboard Streamlit para visualização dos dados, versão 2. Utilizada para deploy.
 │ └── dashboard_bitcoin_postgres_v3.py          # Dashboard Streamlit para visualização dos dados, versão 3. Utilizada para testes local
 ├── pipeline/
 │ ├── get_bitcoin_price.py                      # Extração simples do preço do Bitcoin.
@@ -87,7 +87,7 @@ pip install -r requirements.txt
 
 4. Execute os scripts desejados:
 
-- Para coletar dados e salvar no banco local:
+- Para coletar dados e salvar no banco NoSQL local:
 ```bash
 python pipeline/consulta_preco_bitcoin_v2.py
 ```
@@ -99,8 +99,97 @@ python pipeline/consulta_preco_bitcoin_v3_postgres.py
 
 - Para visualizar o dashboard:
 ```bash
-streamlit run dashboard/dashboard_bitcoin_postgres.py
+streamlit run dashboard/dashboard_bitcoin_postgres_v2.py
 ```
+
+## 🧪 Como Fazer o Deploy de todo o Projeto
+
+### Deploy do banco de dados (PostgreSQL) na Render
+
+1. Acesse: [https://dashboard.render.com](https://dashboard.render.com)
+2. Clique em **New > PostgreSQL**
+3. Dê um nome ao banco e clique em **Create Database**
+4. Aguarde alguns minutos até o banco estar disponível
+5. Copie a connection string completa no campo **External Database URL**, algo como:  
+   `postgresql://user:password@host/dbname`
+
+> ⚠️ **Importante:**  
+> O valor de `host` **não** é o que aparece no campo **Host** da Render.  
+> Em vez disso, ele está localizado no campo **External Database URL**, a partir do caractere `@` até a primeira barra `/`.
+
+**Exemplo:**  
+Se o campo **External Database URL** for:
+   `postgresql://dbname_****_user:***********@dpg-*******************-a.oregon-postgres.render.com/dbname_****`
+
+Então o `host` é:
+   `dpg-*******************-a.oregon-postgres.render.com`
+
+6. Essa URL completa será usada como valor da variável de ambiente `DATABASE_KEY`
+
+---
+
+### Deploy do dashboard no Streamlit
+
+1. Acesse: [https://share.streamlit.io](https://share.streamlit.io)
+2. Crie um novo projeto apontando para o repositório do GitHub
+3. No campo **Main file path**, insira o caminho correto do arquivo principal do app:
+    `dashboard/dashboard_bitcoin_postgres_v2.py`
+4. Depois vá em **Advanced settings** e adicione as variáveis de ambiente:
+    `DATABASE_KEY=postgresql://user:password@host/dbname`
+
+    > Exemplo:
+    > `DATABASE_KEY=postgresql://dbname_****_user:***********@dpg-*******************-a.oregon-postgres.render.com/dbname_****`
+    
+5. O app será carregado automaticamente após isso
+
+---
+
+### Criar imagem Docker local (opcional para testes)
+
+Caso deseje testar localmente o backend com Docker antes de fazer o deploy (recomendado):
+```bash
+docker build -t bitcoin-agent .
+```
+
+Se tudo estiver funcionando depois de testar:
+```bash
+docker ps     # para ver o ID ou nome do container
+docker stop <id_ou_nome_do_container>
+```
+
+---
+
+###  Deploy do backend com Railway
+
+Instale a CLI do Railway:
+```bash
+npm install -g @railway/cli
+```
+
+Faça login:
+```bash
+railway login
+```
+
+Inicialize o projeto:
+```bash
+railway init
+```
+
+Acesse o projeto criado na [Railway](https://railway.com/dashboard) e vá na aba **Variables** para adicionar sua variável de ambiente:
+```bash
+DATABASE_KEY=postgresql://user:password@host/dbname
+```
+
+> Exemplo:
+> `DATABASE_KEY=postgresql://dbname_****_user:***********@dpg-*******************-a.oregon-postgres.render.com/dbname_****`
+
+Faça o deploy:
+```bash
+railway up
+```
+
+Pronto, agora todo o deploy está feito!
 
 ## 🤝 Contexto do Projeto
 Este projeto foi desenvolvido para fins educacionais e demonstração de automação de coleta de dados financeiros, integração com agentes de IA e visualização interativa.
