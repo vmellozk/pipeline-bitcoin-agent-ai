@@ -34,21 +34,27 @@ Criar uma solução simples e modular que:
 
 ```bash
 PIPELINE-BITCOIN-AGENT-AI
+├── .devcontainer/
+│ ├── devcontainer.json                         # Configuração para ambientes de desenvolvimento no VS Code com Dev Containers.
 ├── agents/
-│ ├── bitcoin_agent.py                          # Agente IA com Groq e DuckDuckGo
-│ └── bitcoin_agent_postgres.py                 # Agente IA com integração ao PostgreSQL
+│ ├── bitcoin_agent.py                          # Agente IA com Groq e DuckDuckGo.
+│ └── bitcoin_agent_postgres.py                 # Agente IA com integração ao PostgreSQL.
 ├── dashboard/
-│ └── dashboard_bitcoin_postgres.py             # Dashboard Streamlit para visualização dos dados
+│ └── dashboard_bitcoin_postgres_v1.py          # Dashboard Streamlit para visualização dos dados, versão 1.
+│ └── dashboard_bitcoin_postgres_v2.py          # Dashboard Streamlit para visualização dos dados, versão 2. Utilizada para deploy.
+│ └── dashboard_bitcoin_postgres_v3.py          # Dashboard Streamlit para visualização dos dados, versão 3. Utilizada para testes local
 ├── pipeline/
-│ ├── get_bitcoin_price.py                      # Extração simples do preço do Bitcoin
-│ ├── nasa_mars_photos.py                       # Consumo de API da NASA
-│ ├── consulta_preco_bitcoin_v1.py              # ETL básico do preço do Bitcoin
-│ ├── consulta_preco_bitcoin_v2_tinydb.py       # ETL com armazenamento em TinyDB
-│ └── consulta_preco_bitcoin_v3_postgres.py     # ETL completo com PostgreSQL e SQLAlchemy
-├── db.json                                     # Banco local TinyDB (você precisa criar um arquivo com esse nome para o tinydb funcionar)
-├── .env                                        # Variáveis de ambiente (aqui você coloca as keys, credenciais...)
-├── .gitignore                                  # Arquivos ignorados no Git
-└── README.md                                   # Documentação do projeto
+│ ├── get_bitcoin_price.py                      # Extração simples do preço do Bitcoin.
+│ ├── nasa_mars_photos.py                       # Consumo de API da NASA.
+│ ├── consulta_preco_bitcoin_v1.py              # ETL básico do preço do Bitcoin.
+│ ├── consulta_preco_bitcoin_v2_tinydb.py       # ETL com armazenamento em TinyDB.
+│ └── consulta_preco_bitcoin_v3_postgres.py     # ETL completo com PostgreSQL e SQLAlchemy.
+├── db.json                                     # Banco local TinyDB (você precisa criar um arquivo com esse nome para o tinydb funcionar).
+├── .dockerignore                               # Arquivos ignorados no Docker.
+├── Dockerfile                                  # Define a imagem Docker do projeto para deploy do agente ETL.
+├── .env                                        # Variáveis de ambiente (aqui você coloca as keys, credenciais...).
+├── .gitignore                                  # Arquivos ignorados no Git.
+└── README.md                                   # Documentação do projeto.
 ```
 
 ## 🛠️ Tecnologias Utilizadas
