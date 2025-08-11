@@ -54,8 +54,13 @@ def main():
         if refresh:
             st.rerun()
         
+        # Formatando os dados para exportar em CSV
+        df_export = df.copy()
+        df_export['valor'] = "$" + df_export['valor'].apply(lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+        df_export['timestamp'] = pd.to_datetime(df_export['timestamp']).dt.strftime('%d/%m/%Y %H:%M:%S')
+        
         # Botão de exportar em CSV
-        csv_data = df.to_csv(index=False, sep=";", decimal=",", encoding="utf-8-sig")
+        csv_data = df_export.to_csv(index=False, sep=";", encoding="utf-8-sig")
         st.download_button("Baixar CSV", data=csv_data, file_name="dados_bitcoin.csv", mime="text/csv")
         
         # Gráfico do Histórico do Preço do Bitcoin
