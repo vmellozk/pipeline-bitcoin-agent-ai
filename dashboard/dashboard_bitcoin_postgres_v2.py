@@ -55,7 +55,8 @@ def main():
             st.rerun()
         
         # Botão de exportar em CSV
-        st.download_button("Baixar CSV", data=df.to_csv(index=False), file_name="dados_bitcoin.csv", mime="text/csv")
+        csv_data = df.to_csv(index=False, sep=";", decimal=",", encoding="utf-8-sig")
+        st.download_button("Baixar CSV", data=csv_data, file_name="dados_bitcoin.csv", mime="text/csv")
         
         # Gráfico do Histórico do Preço do Bitcoin
         st.subheader("Evolução do Preço do Bitcoin")
