@@ -116,14 +116,24 @@ def main():
         media_7dias = ultimos_7dias['valor'].mean()
         legenda_media = "últimos 7 dias"
         
+        # Pegando o valor da data do valor máximo e do valor mínimo
+        preco_max = df['valor'].max()
+        preco_min = df['valor'].min()
+        data_max = df.loc[df['valor'] == preco_max, 'timestamp'].iloc[0]
+        data_min = df.loc[df['valor'] == preco_min, 'timestamp'].iloc[0]
+        
+        legenda_max = f"em {data_max.strftime('%d/%m/%Y às %H:%M:%S')}"
+        legenda_min = f"em {data_min.strftime('%d/%m/%Y às %H:%M:%S')}"       
+        
         # Estatísticas Gerais
         st.subheader("Estatísticas Gerais")
         col1, col2, col3, col4 = st.columns(4)
         
         col1.metric("Preço Atual", f"${preco_atual:,.2f}", legenda_delta)
         col2.metric("Preço Máximo", f"${df['valor'].max():,.2f}")
+        col2.markdown(f"<span style='font-size:12px; color:gray;'>{legenda_max}</span>", unsafe_allow_html=True)
         col3.metric("Preço Mínimo", f"${df['valor'].min():,.2f}")
-        
+        col3.markdown(f"<span style='font-size:12px; color:gray;'>{legenda_min}</span>", unsafe_allow_html=True)
         col4.metric("Preço Médio", f"${media_7dias:,.2f}", legenda_media)
         
         # Análise de tendência
