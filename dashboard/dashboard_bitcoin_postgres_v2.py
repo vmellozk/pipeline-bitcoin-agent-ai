@@ -145,15 +145,20 @@ def main():
         df_daily['pct_change'] = df_daily['valor'].pct_change() * 100
         df_daily['dia'] = df_daily['timestamp'].dt.strftime('%d/%m')
         
-        grafico_var_pct = alt.Chart(df_daily).mark_bar(color='purple').encode(
+        grafico_var_pct = alt.Chart(df_daily).mark_bar().encode(
             x=alt.X('dia:N', title='Data', axis=alt.Axis(labelAngle=-45)),
             y=alt.Y('pct_change:Q', title='Variação %', axis=alt.Axis(format='.2f')),
+            color=alt.condition(
+                alt.datum.pct_change > 0,
+                alt.value('green'),
+                alt.value('red')
+            ),
             tooltip=[alt.Tooltip('timestamp:T', title='Data'),
                      alt.Tooltip('pct_change:Q', title='Variação (%)', format='.2f')]
         ).properties(
             title='Variação Percentual Diária',
             width='container',
-            height=300
+            height=500
         ).interactive()
         st.altair_chart(grafico_var_pct, use_container_width=True)
         
