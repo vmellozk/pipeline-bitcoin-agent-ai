@@ -35,7 +35,15 @@ def main():
     
     if not df.empty:
         st.subheader("Dados Recentes")
-        st.dataframe(df)
+        
+        df_display = df.copy()
+        df_display['valor'] = df_display['valor'].map(lambda x: f"${x:,.2f}")
+        df_display['timestamp'] = df_display['timestamp'].dt.strftime('%d/%m/%Y %H:%M:%S')
+        
+        st.dataframe(df_display.style.format({
+            'valor': "{:>}",
+            'timestamp': "{}"
+        }))
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         df = df.sort_values(by='timestamp')
         
@@ -104,10 +112,14 @@ def main():
         
         # Estatísticas Gerais
         st.subheader("Estatísticas Gerais")
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
+        
         col1.metric("Preço Atual", f"${preco_atual:,.2f}", legenda_delta)
         col2.metric("Preço Máximo", f"${df['valor'].max():,.2f}")
         col3.metric("Preço Mínimo", f"${df['valor'].min():,.2f}")
+        
+        media_valor = df['valor'].mean()
+        col4.metric("Preço Médio", f"${media_valor:,.2f}")
         
         # Análise de tendência
         tendencia = "em alta" if delta > 0 else "em queda"
