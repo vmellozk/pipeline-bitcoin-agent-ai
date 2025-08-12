@@ -29,7 +29,7 @@ def ler_dados_postgres():
 def main():
     st.set_page_config(page_title="Dashboard de Preços do Bitcoin", layout="wide")
     st.title("Dashboard de Preços do Bitcoin")
-    st.write("Este dashboard exibe os dados do preço do Bitcoin coletados periodicamente em um banco PostgreSQL. (ainda com backend local)")
+    st.write("Este dashboard exibe os dados do preço do Bitcoin coletados periodicamente em um banco PostgreSQL.")
     
     df = ler_dados_postgres()
     
@@ -110,6 +110,12 @@ def main():
         legenda_delta = f"{delta:.2f}% (vs 24h atrás)"
         df.drop(columns='diferenca', inplace=True)
         
+        # Calculando o intervalo dos dias para comparar o preço médio
+        intervalo_7dias = data_atual - timedelta(days=7)
+        ultimos_7dias = df[df['timestamp'] >= intervalo_7dias]
+        media_7dias = ultimos_7dias['valor'].mean()
+        legenda_media = "últimos 7 dias"
+        
         # Estatísticas Gerais
         st.subheader("Estatísticas Gerais")
         col1, col2, col3, col4 = st.columns(4)
@@ -118,8 +124,7 @@ def main():
         col2.metric("Preço Máximo", f"${df['valor'].max():,.2f}")
         col3.metric("Preço Mínimo", f"${df['valor'].min():,.2f}")
         
-        media_valor = df['valor'].mean()
-        col4.metric("Preço Médio", f"${media_valor:,.2f}")
+        col4.metric("Preço Médio", f"${media_7dias:,.2f}", legenda_media)
         
         # Análise de tendência
         tendencia = "em alta" if delta > 0 else "em queda"
