@@ -38,7 +38,7 @@ def main():
         
         df_display = df.copy()
         df_display['valor'] = df_display['valor'].map(lambda x: f"${x:,.2f}")
-        df_display['timestamp'] = df_display['timestamp'].dt.strftime('%d/%m/%Y %H:%M:%S')
+        df_display['timestamp'] = df_display['timestamp'].dt.strftime('%d/%m/%Y às %H:%M:%S')
         
         st.dataframe(df_display.style.format({
             'valor': "{:>}",
@@ -52,8 +52,8 @@ def main():
         data_mais_recente = df['timestamp'].max().date()
         data_inicial_padrao = data_mais_recente - timedelta(days=30)
         
-        data_inicial = st.sidebar.date_input("Data Inicial", value=data_inicial_padrao)
-        data_final = st.sidebar.date_input("Data Final", value=data_mais_recente)
+        data_inicial = st.sidebar.date_input("Data Inicial", value=data_inicial_padrao, format="DD/MM/YYYY")
+        data_final = st.sidebar.date_input("Data Final", value=data_mais_recente, format="DD/MM/YYYY")
         df_filtrado = df[(df['timestamp'].dt.date >= data_inicial) & (df['timestamp'].dt.date <= data_final)]
         
         # Botão de atualizar
